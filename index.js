@@ -3,6 +3,7 @@ const helmet = require("helmet");
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const cors = require('cors');
+require('dotenv').config();
 
 const routes = require('./routes');
 
