@@ -16,7 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(expressWinston.logger({
   transports: [
-    new winston.transports.Console()
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: `./log/${new Date().getTime()}-log.txt`,
+    }),
   ],
   format: winston.format.combine(
     winston.format.label({ label: 'server'}),
@@ -33,6 +36,7 @@ app.use(expressWinston.logger({
 
 app.use('/api', routes);
 
-app.listen(8000, () => {
-  console.info('Listening on 8000');
+const port = process.env.PORT || 8000;
+app.listen(process.env.PORT || 8000, () => {
+  console.info(`Listening on ${port}`);
 });
