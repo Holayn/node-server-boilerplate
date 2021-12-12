@@ -1,5 +1,5 @@
-const express = require("express");
-const helmet = require("helmet");
+const express = require('express');
+const helmet = require('helmet');
 const winston = require('winston');
 const expressWinston = require('express-winston');
 const cors = require('cors');
@@ -29,7 +29,7 @@ app.use(expressWinston.logger({
     },
   )),
   meta: false,
-  msg: "HTTP {{req.method}} {{req.url}}",
+  msg: 'HTTP {{req.method}} {{req.url}}',
   expressFormat: true,
   colorize: false,
 }));
