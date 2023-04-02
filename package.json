@@ -12,6 +12,8 @@
     "express": "^4.17.1",
     "express-winston": "^4.1.0",
     "helmet": "^4.5.0",
-    "winston": "^3.3.3"
+    "morgan": "^1.10.0",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }
