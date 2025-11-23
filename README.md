@@ -1,41 +1,28 @@
-## Notes
+# Node Server Boilerplate
 
-- routes served up under /api
+This is a basic boilerplate for a Node.js server using TypeScript.
 
-### Serving up app in a monorepo
+## Getting Started
 
-```
-const path = require('path');
-const history = require('connect-history-api-fallback');
+1.  Install dependencies:
+    ```bash
+    npm install
+    ```
+2.  Create a `.env` file from the `sample.env` file and fill in the required environment variables.
+3.  Start the server:
+    ```bash
+    npm run dev
+    ```
 
-...
+## Linting
 
-app.use(history({
-  rewrites: [
-    {
-      from: /\/api/,
-      to: function(context) {
-        return context.parsedUrl.pathname;
-      }
-    },
-  ],
-}));
-app.use('/', express.static(path.join(__dirname, '../app/dist')));
-```
+This project uses ESLint and Prettier for linting and formatting.
 
-### Enabling HTTPS
-
-- For local development, generate certs with [mkcert](https://github.com/FiloSottile/mkcert)
-
-```
-const https = require('https');
-const fs = require('fs');
-
-...
-
-const httpsServer = https.createServer({
-  key: fs.readFileSync(__dirname + '/sslcert/192.168.0.133-key.pem', 'utf8'),
-  cert: fs.readFileSync(__dirname + '/sslcert/192.168.0.133.pem', 'utf8'),
-}, app);
-httpsServer.listen(8000);
-```
+-   To run the linter, use:
+    ```bash
+    npm run lint
+    ```
+-   To fix linting errors, use:
+    ```bash
+    npm run lint -- --fix
+    ```

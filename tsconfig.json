@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",                                  /* Specify ECMAScript target version */
+    "module": "NodeNext",                                /* Specify module code generation: 'NodeNext' for ESM support in modern Node.js */
+    "moduleResolution": "NodeNext",                      /* Specify how modules are resolved: 'NodeNext' works with 'NodeNext' module setting */
+
+    /* Type Checking */
+    "strict": true,                                      /* Enable all strict type-checking options */
+    "esModuleInterop": true,                             /* Enables compatibility with CommonJS modules for default imports */
+
+    /* Output and Directory */
+    "outDir": "./dist",                                  /* Redirect output structure to this directory */
+    "rootDir": "./",                                  /* Specify the root directory of source files */
+
+    /* Emit */
+    "sourceMap": true,                                   /* Create source map files for emitted JavaScript files */
+    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is consistent throughout a given file path */
+
+    /* Other */
+    "skipLibCheck": true                                 /* Skip type checking of declaration files */
+  },
+  "include": ["src/**/*", "server.ts"],                               /* Specify files to include in compilation */
+  "exclude": ["node_modules"]                            /* Specify files to exclude from compilation */
+}
