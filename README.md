@@ -24,5 +24,5 @@ This project uses ESLint and Prettier for linting and formatting.
     ```
 -   To fix linting errors, use:
     ```bash
-    npm run lint -- --fix
+    npm run lint:fix
     ```
