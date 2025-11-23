@@ -1,38 +1,29 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
-import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import cron from 'node-cron';
 import { join } from 'path';
-import { randomBytes } from 'crypto';
 
 import { getDirname } from './src/util/path.js';
 import logger from './src/util/logger.js';
 import routes from './src/routes/index.js';
 import { configureHbs } from './src/config/hbs.js';
-
-dotenv.config();
-
-const PORT = process.env.PORT || 3000;
-
-const nonce = randomBytes(16).toString('base64');
+import { PORT } from './src/config/env.js';
+import { nonceGenerator, cspDirectives } from './src/middleware/security.js';
 
 const app: Application = express();
 
-configureHbs(app, nonce);
-
+app.use(nonceGenerator);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'"],
-        imgSrc: ['*'],
-        objectSrc: ["'none'"],
+        ...cspDirectives,
+        scriptSrc: [...cspDirectives.scriptSrc, (req, res) => `'nonce-${(res as any).locals.nonce}'`],
+        styleSrc: [...cspDirectives.styleSrc, (req, res) => `'nonce-${(res as any).locals.nonce}'`],
       },
     },
   }),
@@ -69,8 +60,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', routes);
+configureHbs(app);
 
+app.use('/', routes);
 app.get('/health', (req: Request, res: Response) => {
   res.sendStatus(200);
 });
