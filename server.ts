@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
+import helmet from 'helmet';
 
 import logger from './src/util/logger.js';
 import routes from './src/routes/index.js';
@@ -13,6 +14,7 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
 app.use(
   morgan('combined', {
     stream: {
