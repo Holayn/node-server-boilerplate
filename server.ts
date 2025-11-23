@@ -13,13 +13,15 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('combined', {
-  stream: {
-    write: message => {
-      logger.http(message.trim());
-    }
-  }
-}));
+app.use(
+  morgan('combined', {
+    stream: {
+      write: (message) => {
+        logger.http(message.trim());
+      },
+    },
+  }),
+);
 
 app.use('/', routes);
 
@@ -28,12 +30,13 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // --- Global Error Handler (Must be the last middleware) ---
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error(err);
   res.status(500).send('Internal Server Error');
 });
 
-process.on('unhandledRejection', (reason: Error | any) => {
+process.on('unhandledRejection', (reason: Error) => {
   logger.error(reason);
 });
 

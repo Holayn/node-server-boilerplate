@@ -9,7 +9,9 @@
     "build": "tsc",
     "watch:build": "tsc -w",
     "watch:run": "nodemon --inspect dist/server.js",
-    "dev": "concurrently \"npm:watch:build\" \"npm:watch:run\""
+    "dev": "concurrently \"npm:watch:build\" \"npm:watch:run\"",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
@@ -22,8 +24,14 @@
   "devDependencies": {
     "@types/express": "^5.0.5",
     "@types/morgan": "^1.9.10",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "concurrently": "^9.2.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "nodemon": "^3.1.11",
+    "prettier": "^3.2.5",
     "typescript": "^5.9.3"
   }
 }

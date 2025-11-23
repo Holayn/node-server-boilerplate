@@ -1,4 +1,9 @@
-import { createLogger, format, transports, Logger as winstonLogger } from 'winston';
+import {
+  createLogger,
+  format,
+  transports,
+  Logger as winstonLogger,
+} from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import { join } from 'node:path';
 import { getDirname } from './path.js';
@@ -34,10 +39,7 @@ class Logger {
           zippedArchive: true,
           maxSize: '20m',
           maxFiles: '14d',
-          format: combine(
-            timestamp(),
-            json(),
-          ),
+          format: combine(timestamp(), json()),
         }),
       ],
       exitOnError: false,
@@ -50,7 +52,10 @@ class Logger {
             timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
             errors({ stack: true }),
             colorize(),
-            printf(({ timestamp, level, message, stack, ...meta }) => `${timestamp} ${level}: ${message}${Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : ''}${stack ? `\n${stack}` : ''}`),
+            printf(
+              ({ timestamp, level, message, stack, ...meta }) =>
+                `${timestamp} ${level}: ${message}${Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : ''}${stack ? `\n${String(stack)}` : ''}`,
+            ),
           ),
         }),
         new DailyRotateFile({
@@ -60,11 +65,7 @@ class Logger {
           zippedArchive: true,
           maxSize: '20m',
           maxFiles: '14d',
-          format: combine(
-            timestamp(),
-            errors({ stack: true }),
-            json(),
-          ),
+          format: combine(timestamp(), errors({ stack: true }), json()),
         }),
       ],
       exitOnError: false,
@@ -95,18 +96,16 @@ class Logger {
     this._appLogger.error(message, { ...meta, stack: errorObj?.stack });
 
     if (shouldNotify) {
-      this.sendNotification(message).catch((err) => {
-        this.error(`Failed to send notification: ${err.message}`, { notify: false });
+      this.sendNotification(message).catch((err: Error) => {
+        this.error(`Failed to send notification: ${err.message}`, {
+          notify: false,
+        });
       });
     }
   }
 
   private async sendNotification(message: string) {
-    try {
-      await notify(message);
-    } catch (error) {
-      throw error;
-    }
+    await notify(message);
   }
 }
 
