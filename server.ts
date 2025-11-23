@@ -2,6 +2,9 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { join } from 'path';
+import { getDirname } from './src/util/path.js';
 
 import logger from './src/util/logger.js';
 import routes from './src/routes/index.js';
@@ -14,7 +17,20 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ['*'],
+        objectSrc: ["'none'"],
+      },
+    },
+  }),
+);
+app.use(cookieParser());
 app.use(
   morgan('combined', {
     stream: {
@@ -24,6 +40,27 @@ app.use(
     },
   }),
 );
+app.use(
+  express.static(join(getDirname(import.meta.url), '../public'), {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.js')) {
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+      }
+    },
+  }),
+);
+app.use((req, res, next) => {
+  // Only apply cache control headers to HTML responses
+  if (req.accepts('html')) {
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate',
+    );
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
 
 app.use('/', routes);
 
