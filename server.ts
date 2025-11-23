@@ -24,19 +24,33 @@ app.use(morgan('combined', {
 app.use('/', routes);
 
 app.get('/health', (req: Request, res: Response) => {
-    res.sendStatus(200);
+  res.sendStatus(200);
 });
 
 // --- Global Error Handler (Must be the last middleware) ---
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: err.message
-    });
+  logger.error(err);
+  res.status(500).send('Internal Server Error');
+});
+
+process.on('unhandledRejection', (reason: Error | any) => {
+  logger.error(reason);
 });
 
 // --- Server Startup ---
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Access it at: http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+  logger.info(`Server is running on port ${PORT}`);
 });
+
+const gracefulShutdown = (signal: string) => {
+  process.on(signal, () => {
+    logger.info(`${signal} signal received: closing server.`);
+    server.close(() => {
+      logger.info('Server closed.');
+      process.exit(0);
+    });
+  });
+};
+
+gracefulShutdown('SIGTERM');
+gracefulShutdown('SIGINT');

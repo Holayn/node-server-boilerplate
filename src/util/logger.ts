@@ -4,99 +4,110 @@ import { join } from 'node:path';
 import { getDirname } from './path.js';
 import { notify } from '../services/notify.js';
 
-const { combine, timestamp, json, colorize, printf, align, errors } = format;
+interface ErrorOptions {
+  notify?: boolean;
+  [key: string]: any;
+}
 
-const logDir = join(getDirname(import.meta.url), '../../logs');
+const LOG_DIR = join(getDirname(import.meta.url), '../../../logs');
+
+const { combine, timestamp, json, colorize, printf, errors } = format;
 
 class Logger {
-    _httpLogger: winstonLogger;
-    _appLogger: winstonLogger;
+  _httpLogger: winstonLogger;
+  _appLogger: winstonLogger;
 
-    constructor() {
-        this._httpLogger = createLogger({
-            transports: [
-                new transports.Console({
-                    format: combine(
-                        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                        printf(({ timestamp, message }) => `${timestamp}: ${message}`),
-                        colorize(),
-                        align(),
-                    ),
-                }),
-                new DailyRotateFile({
-                    filename: join(logDir, 'request.log'),
-                    datePattern: 'YYYY-MM-DD',
-                    zippedArchive: true,
-                    maxSize: '20m',
-                    maxFiles: '14d',
-                    format: combine(
-                        timestamp(),
-                        json(),
-                    ),
-                }),
-            ],
-            exitOnError: false,
-        });
+  constructor() {
+    this._httpLogger = createLogger({
+      transports: [
+        new transports.Console({
+          format: combine(
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            colorize(),
+            printf(({ timestamp, message }) => `${timestamp}: ${message}`),
+          ),
+        }),
+        new DailyRotateFile({
+          dirname: LOG_DIR,
+          filename: 'request.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+          format: combine(
+            timestamp(),
+            json(),
+          ),
+        }),
+      ],
+      exitOnError: false,
+    });
 
-        this._appLogger = createLogger({
-            transports: [
-                new transports.Console({
-                    format: combine(
-                        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                        errors({ stack: true }),
-                        printf(({ timestamp, level, message, stack, ...meta }) => `${timestamp} ${level}: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}${stack ? `\n${stack}` : ''}`),
-                        colorize(),
-                    ),
-                }),
-                new DailyRotateFile({
-                    filename: join(logDir, 'server.log'),
-                    datePattern: 'YYYY-MM-DD',
-                    zippedArchive: true,
-                    maxSize: '20m',
-                    maxFiles: '14d',
-                    format: combine(
-                        timestamp(),
-                        json(),
-                    ),
-                }),
-            ],
-            exitOnError: false,
-        });
+    this._appLogger = createLogger({
+      transports: [
+        new transports.Console({
+          format: combine(
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            errors({ stack: true }),
+            colorize(),
+            printf(({ timestamp, level, message, stack, ...meta }) => `${timestamp} ${level}: ${message}${Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : ''}${stack ? `\n${stack}` : ''}`),
+          ),
+        }),
+        new DailyRotateFile({
+          dirname: LOG_DIR,
+          filename: 'server.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+          format: combine(
+            timestamp(),
+            errors({ stack: true }),
+            json(),
+          ),
+        }),
+      ],
+      exitOnError: false,
+    });
+  }
+
+  http(message: string, ...meta: any) {
+    this._httpLogger.info(message, meta);
+  }
+
+  info(message: string, ...meta: any) {
+    this._appLogger.info(message, meta);
+  }
+
+  error(src: Error | string, options: ErrorOptions = {}) {
+    const { notify: shouldNotify = true, ...meta } = options;
+
+    let message: string;
+    let errorObj: Error | undefined;
+
+    if (src instanceof Error) {
+      message = src.message;
+      errorObj = src;
+    } else {
+      message = src;
     }
 
-    http(message: string, ...meta: any[]) {
-        this._httpLogger.http(message, meta);
+    this._appLogger.error(message, { ...meta, stack: errorObj?.stack });
+
+    if (shouldNotify) {
+      this.sendNotification(message).catch((err) => {
+        this.error(`Failed to send notification: ${err.message}`, { notify: false });
+      });
     }
+  }
 
-    info(message: string, ...meta: any[]) {
-        this._appLogger.info(message, meta);
+  private async sendNotification(message: string) {
+    try {
+      await notify(message);
+    } catch (error) {
+      throw error;
     }
-
-    error(src: any, canNotify = true, ...meta: any[]) {
-        let message, stack;
-
-        if (src instanceof Error) {
-            message = src.message;
-            stack = src.stack;
-        } else {
-            message = src;
-        }
-        
-        this._appLogger.error(message, {
-            ...meta,
-            stack,
-        });
-
-        if (canNotify) {
-            (async () => {
-                try {
-                    await notify(message);
-                } catch (e) {
-                    this.error(e, false);
-                }
-            })();
-        }
-    }
+  }
 }
 
 export default new Logger();
