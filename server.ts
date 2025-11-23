@@ -22,8 +22,16 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         ...cspDirectives,
-        scriptSrc: [...cspDirectives.scriptSrc, (req, res) => `'nonce-${(res as any).locals.nonce}'`],
-        styleSrc: [...cspDirectives.styleSrc, (req, res) => `'nonce-${(res as any).locals.nonce}'`],
+        scriptSrc: [
+          ...cspDirectives.scriptSrc,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (req, res) => `'nonce-${(res as any).locals.nonce}'`,
+        ],
+        styleSrc: [
+          ...cspDirectives.styleSrc,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (req, res) => `'nonce-${(res as any).locals.nonce}'`,
+        ],
       },
     },
   }),

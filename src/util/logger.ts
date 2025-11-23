@@ -79,7 +79,7 @@ class Logger {
             timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
             errors({ stack: true }),
             printf(
-              ({ timestamp, level, message, stack, ...meta }) =>
+              ({ timestamp, message, stack, ...meta }) =>
                 `${timestamp}: ${message}${Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : ''}${stack ? `\n${String(stack)}` : ''}`,
             ),
           ),
