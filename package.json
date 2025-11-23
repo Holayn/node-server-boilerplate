@@ -1,5 +1,6 @@
 {
   "name": "node-server-boilerplate",
+  "type": "module",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -8,16 +9,15 @@
     "dev": "ENV=development nodemon --inspect index.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^10.0.0",
-    "express": "^4.17.1",
-    "express-winston": "^4.1.0",
-    "helmet": "^4.5.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "helmet": "^4.6.0",
     "morgan": "^1.10.0",
-    "winston": "^3.3.3",
+    "winston": "^3.18.3",
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.5",
     "nodemon": "^2.0.22"
   }
 }
