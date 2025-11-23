@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import cron from 'node-cron';
 import { join } from 'path';
 import { getDirname } from './src/util/path.js';
 
@@ -82,6 +83,11 @@ process.on('unhandledRejection', (reason: Error) => {
 // --- Server Startup ---
 const server = app.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);
+});
+
+cron.schedule('0 0 * * *', () => {
+  logger.info('CRON START');
+  logger.info('CRON END');
 });
 
 const gracefulShutdown = (signal: string) => {
