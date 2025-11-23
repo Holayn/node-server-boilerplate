@@ -5,16 +5,22 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import cron from 'node-cron';
 import { join } from 'path';
-import { getDirname } from './src/util/path.js';
+import { randomBytes } from 'crypto';
 
+import { getDirname } from './src/util/path.js';
 import logger from './src/util/logger.js';
 import routes from './src/routes/index.js';
+import { configureHbs } from './src/config/hbs.js';
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
+const nonce = randomBytes(16).toString('base64');
+
 const app: Application = express();
+
+configureHbs(app, nonce);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -8,7 +8,7 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "watch:build": "tsc -w",
-    "watch:run": "nodemon --inspect dist/server.js",
+    "watch:run": "nodemon --ext js,hbs,json --inspect dist/server.js",
     "dev": "concurrently \"npm:watch:build\" \"npm:watch:run\"",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
@@ -17,6 +17,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
+    "hbs": "^4.2.0",
     "helmet": "^4.6.0",
     "morgan": "^1.10.0",
     "node-cron": "^4.2.1",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.5",
+    "@types/hbs": "^4.0.5",
     "@types/morgan": "^1.9.10",
     "@types/node-cron": "^3.0.11",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
