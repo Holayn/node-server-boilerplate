@@ -67,6 +67,23 @@ class Logger {
           maxFiles: '14d',
           format: combine(timestamp(), errors({ stack: true }), json()),
         }),
+        new DailyRotateFile({
+          level: 'error',
+          dirname: LOG_DIR,
+          filename: 'error.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+          format: combine(
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            errors({ stack: true }),
+            printf(
+              ({ timestamp, level, message, stack, ...meta }) =>
+                `${timestamp}: ${message}${Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : ''}${stack ? `\n${String(stack)}` : ''}`,
+            ),
+          ),
+        }),
       ],
       exitOnError: false,
     });
