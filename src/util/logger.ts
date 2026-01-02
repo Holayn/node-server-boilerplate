@@ -97,24 +97,35 @@ class Logger {
     this._appLogger.info(message, meta);
   }
 
-  error(src: Error | string, options: ErrorOptions = {}) {
-    const { notify: shouldNotify = true, ...meta } = options;
-
+  error(message: string, error?: Error, options?: ErrorOptions): void;
+  error(error: Error, options?: ErrorOptions): void;
+  error(
+    messageOrError: string | Error,
+    errorOrOptions?: Error | ErrorOptions,
+    options?: ErrorOptions,
+  ): void {
     let message: string;
     let errorObj: Error | undefined;
+    let finalOptions: ErrorOptions = {};
 
-    if (src instanceof Error) {
-      message = src.message;
-      errorObj = src;
+    // Handle different overloads
+    if (typeof messageOrError === 'string') {
+      message = messageOrError;
+      errorObj = errorOrOptions as Error;
+      finalOptions = options || {};
     } else {
-      message = src;
+      message = messageOrError.message;
+      errorObj = messageOrError;
+      finalOptions = (errorOrOptions as ErrorOptions) || {};
     }
 
-    this._appLogger.error(message, { ...meta, stack: errorObj?.stack });
+    this._appLogger.error(message, { ...finalOptions, stack: errorObj?.stack });
+
+    const { notify: shouldNotify = true } = finalOptions;
 
     if (shouldNotify) {
       this.sendNotification(message).catch((err: Error) => {
-        this.error(`Failed to send notification: ${err.message}`, {
+        this.error(`Failed to send notification: ${err.message}`, err, {
           notify: false,
         });
       });
