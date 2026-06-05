@@ -11,6 +11,7 @@ import routes from './src/routes/index.js';
 import { configureHbs } from './src/config/hbs.js';
 import { PORT } from './src/config/env.js';
 import { nonceGenerator, cspDirectives } from './src/middleware/security.js';
+import { validationErrorHandler } from './src/middleware/validation.js';
 
 const app: Application = express();
 
@@ -74,6 +75,8 @@ app.use('/', routes);
 app.get('/health', (req: Request, res: Response) => {
   res.sendStatus(200);
 });
+
+app.use(validationErrorHandler);
 
 // --- Global Error Handler (Must be the last middleware) ---
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
