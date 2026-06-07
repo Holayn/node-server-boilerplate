@@ -9,6 +9,6 @@ if (!process.env.NOTIFY_SERVICE_URL && process.env.NODE_ENV !== 'development') {
 export const NOTIFY_SERVICE_URL = process.env.NOTIFY_SERVICE_URL;
 export const NOTIFY_SERVICE_USER = process.env.NOTIFY_SERVICE_USER;
 export const PORT = process.env.PORT || 3000;
-export const NODE_ENV = process.env.NODE_ENV || 'development';
+export const NODE_ENV = process.env.NODE_ENV;
 
 export const isDevelopment = NODE_ENV === 'development';
